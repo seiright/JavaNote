@@ -700,3 +700,249 @@ if (over){
 针对`miaosha/do_miaosha`。Linux中开5000个线程，循环10次，也就是发50000个请求对商品秒杀。中途没有报错。得到以下结果：
 ![](images/2022-08-18-17-22-26.png)
 **没有出现超卖问题。**
+
+# 安全优化
+
+## 秒杀接口地址隐藏
+思路：秒杀开始之前，先去请求接口获取秒杀地址
+1. 前端改造：点击秒杀会先调用获取秒杀地址的函数。
+    ```js
+    function getMiaoshaPath() {
+        var goodsId = $("#goodsId").val();
+        g_showLoading();
+        $.ajax({
+            url: "/miaosha/path",
+            type: "GET",
+            data: {
+                goodsId: goodsId,
+                verifyCode: $("#verifyCode").val(),
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    var path = data.data;
+                    doMiaosha(path);
+                } else {
+                    layer.msg(data.msg);
+                }
+            },
+            error: function (data) {
+                if (data!=null&&data.responseJSON!=null){
+                    layer.msg(data.responseJSON.msg);
+                }else {
+                    layer.msg("客户端请求有误");
+                }
+            }
+        });
+    }
+    ```
+2. 接口改造，带上PathVariable参数
+    ```java
+    @PostMapping(value = "/{path}/do_miaosha", produces = "application/json")
+    @ResponseBody
+    public Result<Integer> miaosha(Model model, MiaoshaUser user,@RequestParam("goodsId") long goodsId,
+    @PathVariable("path") String path){
+
+    }
+    ```
+3. 添加生成地址的接口
+    ```java
+    @AccessLimit(seconds = 5,maxCount=5)
+    @GetMapping(value = "/path")
+    @ResponseBody
+    public Result<String> getMiaoshaPath(MiaoshaUser user,
+                                         @RequestParam("goodsId") long goodsId,
+                                         @RequestParam(value = "verifyCode") Integer verifyCode) {
+        boolean check = miaoshaService.checkVerifyCode(user,goodsId,verifyCode);
+        if (!check){
+            return Result.error(CodeMsg.VERIFY_CODE_INCORRECT);
+        }
+        String path = miaoshaService.createMiaoshaPath(user,goodsId);
+        return Result.success(path);
+    }
+    ```
+4. 秒杀收到请求，先验证PathVariable
+   ```java
+    //验证path
+    boolean check = miaoshaService.checkPath(user,goodsId,path);
+    if (!check){
+        return Result.error(CodeMsg.REQUEST_ILLEGAL);
+    }
+   ```
+
+## 数学公式验证码
+思路：点击秒杀之前，先输入验证码，分散用户的请求
+1. 添加生成验证码的接口
+   ```java
+    @GetMapping(value = "/verifyCode")
+    @ResponseBody
+    public Result<String> getMiaoshaverifyCode(HttpServletResponse response, MiaoshaUser user,
+                                               @RequestParam("goodsId") long goodsId) {
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        BufferedImage image = miaoshaService.createVerifyCode(user,goodsId);
+        try {
+            OutputStream out = response.getOutputStream();
+            ImageIO.write(image,"JPEG",out);
+            out.flush();
+            out.close();
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.error(CodeMsg.MIAOSHA_FAIL);
+        }
+    }
+   ```
+2. 在获取秒杀路径的时候，验证验证码
+    ```java
+    public boolean checkVerifyCode(MiaoshaUser user, long goodsId, Integer verifyCode) {
+        if (user==null||goodsId<=0||verifyCode==null){
+            return false;
+        }
+        Integer codeOld = redisService.get(MiaoshaKey.getMiaoshaVerifyCode, user.getId()+","+goodsId, Integer.class);
+        if (codeOld==null||!codeOld.equals(verifyCode)){
+            return false;
+        }
+        redisService.delete(MiaoshaKey.getMiaoshaVerifyCode, user.getId()+","+goodsId);
+        return true;
+    }
+    ```
+3. ScriptEngine使用
+    ```java
+    private int calc(String exp) {
+        try {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("JavaScript");
+            return (Integer) engine.eval(exp);
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    ```
+
+## 接口防刷
+思路：对接口做限流
+1. 自定义访问控制注解
+   ```java
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface AccessLimit {
+        int seconds() default -1;
+        int maxCount() default -1;
+        boolean needLogin() default true;
+    }
+   ```
+2. 编写访问控制过滤器
+   ```java
+    @Service
+    public class AccessInterceptor extends HandlerInterceptorAdapter {
+
+        MiaoshaUserService userService;
+        RedisService redisService;
+
+        @Autowired
+        public void setRedisService(RedisService redisService) {
+            this.redisService = redisService;
+        }
+
+        @Autowired
+        public void setUserService(MiaoshaUserService userService) {
+            this.userService = userService;
+        }
+
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+            if (handler instanceof HandlerMethod){
+                MiaoshaUser user = getUser(request, response);
+                UserContext.setUser(user);
+                HandlerMethod hm = (HandlerMethod) handler;
+                AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
+                if (accessLimit==null){
+                    return true;
+                }
+                int seconds = accessLimit.seconds();
+                int maxCount = accessLimit.maxCount();
+                boolean needLogin = accessLimit.needLogin();
+                String key = request.getRequestURI();
+                if (needLogin){
+                    if (user==null){
+                        RedirectUtil.redirect(request,response,"/");
+                        render(response, CodeMsg.USER_NOT_LOGIN);
+                        return false;
+                    }
+                    key += "_" + user.getId();
+                }
+                if (seconds==-1){
+                    AccessKey ak = AccessKey.withExpire(seconds);
+                    Integer count = redisService.get(ak,key,Integer.class);
+                    if (count==null){
+                        redisService.set(ak,key,1);
+                    }else if (count<maxCount){
+                        redisService.incr(ak,key);
+                    }else {
+                        render(response,CodeMsg.ACCESS_LIMIT_REACHED);
+                        return false;
+                    }
+                }
+            }
+            return super.preHandle(request, response, handler);
+        }
+        
+        private MiaoshaUser getUser(HttpServletRequest request,HttpServletResponse response){
+            String paramToken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
+            String cookieToken = getCookieValue(request,MiaoshaUserService.COOKIE_NAME_TOKEN);
+            if (StringUtils.isEmpty(cookieToken)&&StringUtils.isEmpty(paramToken)){
+                return null;
+            }
+            String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
+            return  userService.getByToken(response,token);
+        }
+
+        private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies==null||cookies.length<=0){
+                return null;
+            }
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(cookieNameToken)){
+                    return cookie.getValue();
+                }
+            }
+            return null;
+        }
+
+        private void render(HttpServletResponse response, CodeMsg cm) throws Exception{
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            OutputStream out = response.getOutputStream();
+            String str = JSON.toJSONString(Result.error(cm));
+            out.write(str.getBytes(StandardCharsets.UTF_8));
+            out.flush();
+            out.close();
+        }
+
+    }
+   ```
+3. 在WebConfig里添加过滤器
+   ```java
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(accessInterceptor);
+    }
+   ```
+4. 添加注解
+   ```java
+    @AccessLimit(seconds = 5,maxCount=5)
+    @GetMapping(value = "/path")
+    @ResponseBody
+    public Result<String> getMiaoshaPath(MiaoshaUser user,
+                                         @RequestParam("goodsId") long goodsId,
+                                         @RequestParam(value = "verifyCode") Integer verifyCode) {
+        boolean check = miaoshaService.checkVerifyCode(user,goodsId,verifyCode);
+        if (!check){
+            return Result.error(CodeMsg.VERIFY_CODE_INCORRECT);
+        }
+        String path = miaoshaService.createMiaoshaPath(user,goodsId);
+        return Result.success(path);
+    }
+   ```
