@@ -2,7 +2,15 @@
 
 
 - [1. 排序算法](#1-排序算法)
-  - [1.1. 堆排序](#11-堆排序)
+  - [1.1. 冒泡排序](#11-冒泡排序)
+  - [1.2. 插入排序](#12-插入排序)
+  - [1.3. 选择排序](#13-选择排序)
+  - [1.4. 希尔排序](#14-希尔排序)
+  - [1.5. 快速排序](#15-快速排序)
+  - [1.6. 归并排序](#16-归并排序)
+  - [1.7. 计数排序](#17-计数排序)
+  - [1.8. 基数排序(桶排序)](#18-基数排序桶排序)
+  - [1.9. 堆排序](#19-堆排序)
 - [2. 查找](#2-查找)
   - [2.1. 二分查找](#21-二分查找)
   - [2.2. 插值查找](#22-插值查找)
@@ -16,6 +24,7 @@
       - [4.2.2.1. 前序遍历](#4221-前序遍历)
       - [4.2.2.2. 中序遍历](#4222-中序遍历)
       - [4.2.2.3. 后序遍历](#4223-后序遍历)
+      - [4.2.2.4. 层序遍历](#4224-层序遍历)
     - [4.2.3. 二叉树查找](#423-二叉树查找)
       - [4.2.3.1. 前序查找](#4231-前序查找)
       - [4.2.3.2. 中序查找](#4232-中序查找)
@@ -77,17 +86,214 @@
     - [6.6.1. 公交站问题](#661-公交站问题)
     - [6.6.2. 克鲁斯卡尔算法介绍](#662-克鲁斯卡尔算法介绍)
     - [6.6.3. 克鲁斯卡尔算法实现](#663-克鲁斯卡尔算法实现)
-  - [Dijkstra](#dijkstra)
-    - [最短路径问题](#最短路径问题)
-    - [Dijkstra算法过程](#dijkstra算法过程)
-    - [Dijkstra代码实现](#dijkstra代码实现)
-  - [弗洛伊德算法](#弗洛伊德算法)
-    - [算法介绍](#算法介绍)
-    - [算法分析与实现](#算法分析与实现)
-  - [马踏棋盘算法](#马踏棋盘算法)
+  - [6.7. Dijkstra](#67-dijkstra)
+    - [6.7.1. 最短路径问题](#671-最短路径问题)
+    - [6.7.2. Dijkstra算法过程](#672-dijkstra算法过程)
+    - [6.7.3. Dijkstra代码实现](#673-dijkstra代码实现)
+  - [6.8. 弗洛伊德算法](#68-弗洛伊德算法)
+    - [6.8.1. 算法介绍](#681-算法介绍)
+    - [6.8.2. 算法分析与实现](#682-算法分析与实现)
+  - [6.9. 马踏棋盘算法](#69-马踏棋盘算法)
+  - [6.10. 回溯算法](#610-回溯算法)
+    - [6.10.1. 组合问题](#6101-组合问题)
+    - [6.10.2. 排列问题](#6102-排列问题)
+    - [6.10.3. 子集问题](#6103-子集问题)
+    - [6.10.4. 切割问题](#6104-切割问题)
+    - [6.10.5. 总结](#6105-总结)
+  - [6.11. 并查集](#611-并查集)
+    - [6.11.1. 概述](#6111-概述)
+    - [6.11.2. 通用代码](#6112-通用代码)
+    - [6.11.3. 总结](#6113-总结)
 # 1. 排序算法
+![](images/2022-08-23-21-31-09.png)
 
-## 1.1. 堆排序
+## 1.1. 冒泡排序
+```java
+public static void bubbleSort(int[] arr) {
+    int temp;
+    //高值会冒泡到最后边。每冒一次泡。向右比较的步数就减少一次，因为肯定比已经冒泡到右边的值小。
+    for (int i = 0; i < arr.length; i++) {
+        for (int j = 0; j < arr.length -i- 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+```
+
+## 1.2. 插入排序
+插入排序操作类似于摸牌并将其从大到小排列。每次摸到一张牌后，根据其点数插入到确切位置。
+![](images/InsertSort.gif)
+```Java
+public static void insertSort(int[] arr) {
+    int j;
+    //从第二个元素开始往前插。前面的数组都是有序的
+    for (int i = 1; i < arr.length; i++) {
+        int temp = arr[i];
+        //往前找到合适的位置。遍历的每个元素往后退
+        for (j = i - 1; j >= 0 && temp < arr[j]; j--) {
+            arr[j + 1] = arr[j];
+        }
+        //插入
+        arr[j + 1] = temp;
+    }
+}
+```
+
+
+## 1.3. 选择排序
+每一趟从待排序的数据元素中选择最小（或最大）的一个元素作为首元素，直到所有元素排完为止。
+![](images/2022-09-11-13-46-49.png)
+```java
+public static void selectS(int[] arr) {
+    for (int i = 0; i < arr.length; i++) {
+        int min = arr[i];
+        int minIndex = i;
+        //找到最小的值和对应的下标
+        for (int j = i + 1; j < arr.length; j++) {
+            if (min > arr[j]){
+                min = arr[j];
+                minIndex = j;
+            }
+        }
+        arr[minIndex] = arr[i];
+        arr[i] = min;
+    }
+}
+```
+
+## 1.4. 希尔排序
+![](images/2022-09-11-13-58-44.png)
+```java
+public static void shellSort(int[] arr) {
+    //分组
+    for (int gap = arr.length / 2; gap > 0; gap /= 2) {
+        //组内插排
+        for (int i = gap; i < arr.length; i++) {
+            //向前插入
+            int j = i-gap,temp = arr[i];
+            for (; j >= 0&&temp<arr[j]; j -= gap) {
+                arr[j+gap] = arr[j];
+            }
+            arr[j+gap] = temp;
+        }
+    }
+}
+```
+
+## 1.5. 快速排序
+通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列
+![](images/QuickSort.gif)
+```Java
+public static void quickSort(int[] arr, int left, int right) {
+    if (left >= right) return;
+    int pivot = arr[left];
+    int l = left;
+    int r = right;
+    int temp;
+    while (l < r) {
+        //以左边值为基准则右边先动。否则会损害已经排好的顺序。
+        while (arr[r] >= pivot && l < r) r--;
+        while (arr[l] <= pivot && l < r) l++;
+        if (l == r) break;
+        temp = arr[r];
+        arr[r] = arr[l];
+        arr[l] = temp;
+    }
+    arr[left] = arr[l];
+    arr[l] = pivot;
+    quickSort(arr, left, r - 1);
+    quickSort(arr, l + 1, right);
+}
+```
+
+## 1.6. 归并排序
+![](images/2022-09-11-16-09-53.png)
+```java
+public static void mergeSort(int[] res,int[] arr, int left,int right){
+    if (left>=right) return;
+    int mid = (left+right)/2;
+    mergeSort(res,arr,left,mid); //向左递归分解
+    mergeSort(res,arr,mid+1,right); //向右递归分解
+    merge(res,arr,left,mid,right); //每次分解到顶就开始合并
+}
+
+public static void merge(int[] res, int[] arr,int left,int mid,int right){
+    int i=left,j=mid+1;
+    int index = 0;
+    while (i<=mid&&j<=right){
+        res[index++] = arr[i]<=arr[j] ? arr[i++]: arr[j++];
+    }
+    //将剩下的一边填充到res里面
+    if (i<=mid) System.arraycopy(arr,i,res,index,mid-i+1);
+    else if(j<=right)System.arraycopy(arr,j,res,index,right-j+1);
+    //将res拷贝到arr里面。
+    System.arraycopy(res,0,arr,left,right-left+1);
+}
+```
+
+## 1.7. 计数排序
+计数排序的核心在于将输入的数据值转化为键存储在额外开辟的数组空间中。作为一种线性时间复杂度的排序，计数排序要求输入的数据必须是有确定范围的整数。
+用来计数的数组C的长度取决于待排序数组中数据的范围（等于待排序数组的最大值与最小值的差加上1），然后进行分配、收集处理
+1. 分配。扫描一遍原始数组，以当前值-minValue作为下标，将该下标的计数器增1。
+2. 收集。扫描一遍计数器数组，按顺序把值收集起来。
+
+![](images/CountSort.gif)
+```java
+public static void countSort(int[] arr) {
+    int max = Arrays.stream(arr).max().orElse(0);
+    int min = Arrays.stream(arr).min().orElse(0);
+    int interval = max - min + 1;
+    int[] bucket = new int[interval];
+    int[] bucketCount = new int[interval];
+    for (int j : arr) {
+        int pos = j - min;
+        bucketCount[pos]++;
+        bucket[pos] = j;
+    }
+    int index = 0;
+    for (int i = 0; i < bucket.length; i++) {
+        int val = bucket[i];
+        while (bucketCount[i]--!=0) arr[index++] = val;
+    }
+}
+```
+
+## 1.8. 基数排序(桶排序)
+将所有待比较数值统一为同样的数位长度，数位较短的数前面补零。然后，从最低位开始，依次进行一次排序。这样从最低位排序一直到最高位排序完成以后, 数列就变成一个有序序列。
+![](images/2022-09-11-20-04-03.png)
+
+```Java
+//基数排序
+public static void radixSort(int[] arr) {
+    int digitOfElement;
+    int[][] bucket = new int[10][arr.length]; //将arr中的每个数放到对应桶里。行表示基数0-9，列表示最大桶深。
+    int[] bucketElementCounts = new int[10];  //表示每个桶中元素个数
+    int max = Arrays.stream(arr).max().orElse(0); //Java 8 找数组最大值
+    int maxLength = (max + "").length(); //巧妙方法求最大值位数
+    int index;
+
+    //round表示数字第round位，n用来辅助取round位的值。round = 0即表示从个位开始。
+    for (int round = 0, n = 1; round < maxLength; round++, n *= 10) {
+        for (int k : arr) {
+            digitOfElement = k / n % 10;  //取当前位的值
+            bucket[digitOfElement][bucketElementCounts[digitOfElement]++] = k; //放入对应的桶中，同时桶深+1。
+        }
+        index = 0;
+        for (int i = 0; i < bucket.length; i++) {
+            for (int j = 0; j < bucketElementCounts[i]; j++) {
+                arr[index++] = bucket[i][j]; //依次从桶中取出值，完成当前位排序。
+            }
+            bucketElementCounts[i] = 0; //桶深归零
+        }
+    }
+}
+```
+
+## 1.9. 堆排序
 1. 堆排序是利用堆这种数据结构而设计的一种排序算法，堆排序是一种选择排序，它的最坏，最好，平均时间复杂度均为O(nlogn)，它也是不稳定排序。
 2. 堆是具有以下性质的完全二叉树：每个结点的值都大于或等于其左右孩子结点的值，称为大顶堆, 注意 : 没有要求结点的左孩子的值和右孩子的值的大小关系。`arr[i] >= arr[2*i+1] && arr[i] >= arr[2*i+2]`
 3. 每个结点的值都小于或等于其左右孩子结点的值，称为小顶堆。`arr[i] <= arr[2*i+1] && arr[i] <= arr[2*i+2]`
@@ -103,6 +309,8 @@
 2. 此时，整个序列的最大值就是堆顶的根节点。
 3. 将其与末尾元素进行交换，此时末尾就为最大值。
 4. 然后将剩余n-1个元素重新构造成一个堆，这样会得到n个元素的次小值。如此反复执行，便能得到一个有序序列了。
+
+<center><img src="images/HeapSort.gif"></center>
 
 ```java
  //堆排序
@@ -134,7 +342,6 @@ public static void heapSort(int[] arr){
     * @author zhaolifeng
     * @date 2022/7/3 23:14
     */
-
 public static void adjustHeap(int[] arr, int i, int length){
     int temp = arr[i];
     //开始调整
@@ -403,6 +610,24 @@ public void preOrder(){
     //递归向右子树遍历
     if (this.right!=null) this.right.preOrder();
 }
+
+//迭代法
+public void preOrder(TreeNode root, ArrayList<Integer> valList){
+    if (root==null) return;
+    Stack<TreeNode> stack = new Stack<>();
+    stack.push(root);
+    while (!stack.isEmpty()){
+        TreeNode node = stack.pop();
+        valList.add(node.val);
+        if (node.right!=null){
+            stack.push(node.right);
+        }
+        if (node.left!=null){
+            stack.push(node.left);
+        }
+    }
+}
+
 ```
 
 
@@ -421,6 +646,23 @@ public void infixOrder(){
     //递归向右子树遍历
     if (this.right!=null) this.right.infixOrder();
 }
+
+//迭代法
+public void infixOrder(TreeNode root, ArrayList<Integer> valList){
+    if (root==null) return;
+    Stack<TreeNode> stack = new Stack<>();
+    TreeNode curNode = root;
+    while (curNode!=null||!stack.isEmpty()){
+        if (curNode!=null){
+            stack.push(curNode);
+            curNode = curNode.left;
+        }else {
+            curNode = stack.pop();
+            valList.add(curNode.val);
+            curNode = curNode.right;
+        }
+    }
+}
 ```
 
 #### 4.2.2.3. 后序遍历
@@ -437,6 +679,62 @@ public void postOrder(){
     if (this.right!=null) this.right.postOrder();
     //输出当前节点
     System.out.println(this);
+}
+
+//迭代法:遍历顺序 左-右-中 入栈顺序：中-左-右 出栈顺序：中-右-左， 最后翻转结果
+public void postOrder(TreeNode root, ArrayList<Integer> valList){
+    if (root==null) return;
+    Stack<TreeNode> stack = new Stack<>();
+    stack.push(root);
+    while (!stack.isEmpty()){
+        TreeNode node = stack.pop();
+        valList.add(node.val);
+        if (node.left!=null){
+            stack.push(node.left);
+        }
+        if (node.right!=null){
+            stack.push(node.right);
+        }
+    }
+    Collections.reverse(valList);
+}
+```
+
+#### 4.2.2.4. 层序遍历
+```java
+//纪录遍历结果
+public List<List<Integer>> resList = new ArrayList<>();
+
+//递归法
+public void levelOrder(TreeNode root,int deep){
+    if (root==null) return;
+    deep++;
+    if (resList.size()<deep){
+        ArrayList<Integer> list = new ArrayList<>();
+        resList.add(list);
+    }
+    resList.get(deep-1).add(root.val);
+    levelOrder(root.left,deep);
+    levelOrder(root.right,deep);
+}
+
+//迭代法：借助队列
+public void LevelOrder(TreeNode root) {
+    if (root == null) return;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        int length = queue.size();
+        ArrayList<Integer> list = new ArrayList<>();
+        while (length > 0) {
+            TreeNode node = queue.poll();
+            list.add(node.val);
+            if (node.left != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+            length--;
+        }
+        resList.add(list);
+    }
 }
 ```
 
@@ -638,8 +936,6 @@ public void threadedList(){
     }
 }
 ```
-
-
 
 ## 4.3. 赫夫曼树
 ### 4.3.1. 基本介绍
@@ -1425,22 +1721,11 @@ public class Graph {
 通用调用代码
 ```java
 private boolean[] isVisited; //纪录某个结点是否被访问
-//得到第一个邻接结点的下标w
-public int getFirstNeighbor(int index){
-    for (int i = 0; i < vertexList.size(); i++) {
-        if (edges[index][i]>0){
-            return i;
-        }
-    }
-    return -1;
-}
 
 //根据前一个邻接结点的下标来获取下一个邻接结点
 public int getNextNeighbor(int v1,int v2){
     for (int i = v2+1; i < vertexList.size(); i++) {
-        if (edges[v1][i]>0){
-            return i;
-        }
+        if (edges[v1][i]>0) return i;
     }
     return -1;
 }
@@ -1460,34 +1745,43 @@ public int getNextNeighbor(int v1,int v2){
 5. 查找结点v的w邻接结点的下一个邻接结点，转到步骤3。
 
 **代码实现**
-```java
-//深度优先遍历
-public void dfs(boolean[] isVisited,int i){
-    //访问该结点并输出
-    System.out.print(getValueByIndex(i) + "->");
-    //将结点设置为已访问
-    isVisited[i] = true;
-    //查找结点i的第一个邻接结点
-    int w = getFirstNeighbor(i);
-    while (w!=-1){
-        if (!isVisited[w]){
-            dfs(isVisited,w);
+1. **邻接矩阵遍历**
+    ```java
+    //深度优先遍历
+    public void dfs(int vertex) {
+        isVisited[vertex] = true;
+        System.out.print(vertexList.get(vertex) + "=>");
+        int u = getNextNeighbor(vertex,-1);
+        while (u != -1) {
+            if (!isVisited[u]) dfs(u);
+            u = getNextNeighbor(vertex, u);
         }
-        //如果w结点已经被访问过
-        w = getNextNeighbor(i,w);
     }
-}
 
-//对dfs进行重载，遍历所有的结点，并进行dfs(防止有非连通图)
-public void dfs(){
-    //遍历所有结点，进行dfs[回溯]
-    for (int i = 0; i < getNumOfVertex(); i++) {
-        if (!isVisited[i]){
-            dfs(isVisited,i);
+    //对dfs进行重载，遍历所有的结点，并进行dfs(防止有非连通图)
+    public void dfs() {
+        for (int i = 0; i < getNumOfVertex(); i++) {
+            if (!isVisited[i]) dfs(i);
         }
     }
-}
-```
+    ```
+2. **邻接表遍历**
+    ```java
+    public void dfs(int vertex) {
+        isVisited[vertex] = true;
+        System.out.print(vertexList.get(vertex) + "=>");
+        ArrayList<Integer> list = vertexes.get(vertex);
+        for (int v : list) {
+            if (!isVisited[v]) dfs(v);
+        }
+    }
+
+    public void dfs() {
+        for (int i = 0; i < vertexes.size(); i++) {
+            if (!isVisited[i]) dfs(i);
+        }
+    }
+    ```
 
 ### 5.3.2. 广度优先遍历
 图的**广度优先搜索**(Broad First Search) 。
@@ -1505,40 +1799,58 @@ public void dfs(){
     3. 查找结点u的继w邻接结点后的下一个邻接结点w，转到步骤6。
 
 **代码实现**
-```java
-//对一个结点进行广度优先遍历
-private void bfs(boolean[] isVisited,int i){
-    int u; //表示队列头结点对应的下标
-    int w; //邻接结点w
-    //队列，纪录结点访问的顺序
-    LinkedList<Integer> queue = new LinkedList<>();
-    System.out.print(getValueByIndex(i) + "=>");
-    isVisited[i] = true;
-    queue.addLast(i);
-    while (!queue.isEmpty()){
-        //取出队列的头结点下标
-        u = queue.removeFirst();
-        w = getFirstNeighbor(u);
-        while (w!=-1){
-            if (!isVisited[w]){
-                System.out.print(getValueByIndex(w) + "=>");
-                isVisited[w] = true;
-                queue.addLast(w);
+1. **邻接矩阵遍历**
+    ```java
+    //对一个结点进行广度优先遍历
+    public void bfs(int vertex) {
+        isVisited[vertex] = true;
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
+        queue.offer(vertex);
+        int u;
+        while (!queue.isEmpty()) {
+            vertex = queue.poll();
+            System.out.print(vertexList.get(vertex) + "=>");
+            u = getNextNeighbor(vertex, -1);
+            while (u != -1) {
+                if (!isVisited[u]){
+                    isVisited[u] = true;
+                    queue.offer(u);
+                }
+                u = getNextNeighbor(vertex, u);
             }
-            w = getNextNeighbor(u,w);
         }
     }
-}
 
-//遍历所有的结点，都进行广度优先搜索(防止有非连通图)
-public void bfs(){
-    for (int i = 0; i < getNumOfVertex(); i++) {
-        if (!isVisited[i]){
-            bfs(isVisited,i);
+    //遍历所有的结点，都进行广度优先搜索(防止有非连通图)
+    public void bfs(){
+        for (int i = 0; i < getNumOfVertex(); i++) {
+            if (!isVisited[i]) bfs(i);
         }
     }
-}
-```
+    ```
+2. **邻接表遍历**
+    ```java
+    public void bfs(int vertex) {
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
+        queue.offer(vertex);
+        while (!queue.isEmpty()){
+            Integer v = queue.poll();
+            if (isVisited[v]) continue;
+            isVisited[v] = true;
+            System.out.print(vertexList.get(v) + "=>");
+            ArrayList<Integer> list = vertexes.get(v);
+            for (Integer integer : list) {
+                if (!isVisited[integer]) queue.offer(integer);
+            }
+        }
+    }
+
+    public void bfs(){
+        for (int i = 0; i < vertexes.size(); i++) {
+            if (!isVisited[i]) bfs(i);
+        }
+    }
+    ```
 
 # 6. 经典算法
 ## 6.1. 分治算法
@@ -1805,13 +2117,13 @@ public static void main(String[] args) {
 求最小生成树的算法主要是**普里姆**算法和**克鲁斯卡尔**算法
 
 ### 6.5.3. 普利姆算法流程
-普利姆(Prim)算法求最小生成树，也就是在包含n个顶点的连通图中，找出只有(n-1)条边包含所有n个顶点的连通子图，也就是所谓的极小连通子图
+普利姆(Prim)算法求最小生成树，也就是在包含n个顶点的连通图中，找出只有(n-1)条边包含所有n个顶点的连通子图，也就是所谓的**极小连通子图**
 普利姆的算法流程如下:
 
-1. 设G=(V,E)是连通网，T=(U,D)是最小生成树，V,U是顶点集合，E,D是边的集合 
-2. 若从顶点u开始构造最小生成树，则从集合V中取出顶点u放入集合U中，标记顶点v的visited[u]=1
-3. 若集合U中顶点ui与集合V-U中的顶点vj之间存在边，则寻找这些边中权值最小的边，但不能构成回路，将顶点vj加入集合U中，将边（ui,vj）加入集合D中，标记visited[vj]=1
-4. 重复步骤**2**，直到U与V相等，即所有顶点都被标记为访问过，此时D中有n-1条边
+1. 设$G=(V,E)$是连通网，$T=(U,D)$是最小生成树，$V,U$是顶点集合，$E,D$是边的集合
+2. 若从顶点$u$开始构造最小生成树，则从集合$V$中取出顶点$u$放入集合$U$中，标记顶点$u$的$visited[u]=1$
+3. 若集合$U$中顶点$u_i$与集合$V-U$中的顶点$v_j$之间存在边，则寻找这些边中权值最小的边，但不能构成回路，将顶点$v_j$加入集合$U$中，将边$(u_i,v_j)$加入集合$D$中，标记$visited[v_j]=1$
+4. 重复步骤**2**，直到$U$与$V$相等，即所有顶点都被标记为访问过，此时$D$中有$n-1$条边
 
 ### 6.5.4. 普利姆算法实现
 ```java{.line-numbers}
@@ -1841,7 +2153,6 @@ public class PrimAlgorithm {
         minTree.prim(graph,0);
     }
 }
-
 
 //创建最小生成树—>村庄的图
 class MinTree{
@@ -1895,7 +2206,6 @@ class MinTree{
             isVisited[h2] = true;
             minWeight = 10000;
         }
-
     }
 
     //显示图的邻接矩阵
@@ -1905,7 +2215,6 @@ class MinTree{
         }
     }
 }
-
 
 class MGraph{
     int vertexes; //表示图的结点个数
@@ -1920,6 +2229,43 @@ class MGraph{
 
 }
 ```
+**简洁版：求最短连通路径**
+```java
+public class PrimTest {
+    public static void main(String[] args) {
+        char[] data = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+        int vertexes = data.length;
+        int[][] weight = new int[][]{
+                {10000, 5, 7, 10000, 10000, 10000, 2},
+                {5, 10000, 10000, 9, 10000, 10000, 3},
+                {7, 10000, 10000, 10000, 8, 10000, 10000},
+                {10000, 9, 10000, 10000, 10000, 4, 10000},
+                {10000, 10000, 8, 10000, 10000, 5, 4},
+                {10000, 10000, 10000, 4, 5, 10000, 6},
+                {2, 3, 10000, 10000, 4, 6, 10000},};
+        boolean[] isVisited = new boolean[vertexes + 1];
+        isVisited[0] = true;
+        int length = 0;
+        int v = 0;
+        //找n-1条边
+        for (int k = 1; k < vertexes; k++) {
+            int minLen = 10000;
+            for (int i = 0; i < vertexes; i++) {
+                for (int j = 0; j < vertexes; j++) {
+                    if (isVisited[i] && !isVisited[j] && weight[i][j] < minLen){
+                        minLen = weight[i][j];
+                        v = j;
+                    }
+                }
+            }
+            length += minLen;
+            isVisited[v] = true;
+        }
+        System.out.println(length);
+    }
+}
+```
+
 
 ## 6.6. 克鲁斯卡尔算法
 ### 6.6.1. 公交站问题
@@ -1932,9 +2278,11 @@ class MGraph{
 
 ### 6.6.2. 克鲁斯卡尔算法介绍
 - 克鲁斯卡尔(Kruskal)算法，是用来求加权连通图的最小生成树的算法。
-- **基本思想**：按照权值从小到大的顺序选择n-1条边，并保证这n-1条边不构成回路
-- **具体做法**：首先构造一个只含n个顶点的森林，然后依权值从小到大从连通网中选择边加入到森林中，并使森林中不产生回路，直至森林变成一棵树为止
+- **基本思想**：按照权值从小到大的顺序选择n-1条边，并保证这n-1条边不构成回路。
+- **具体做法**：首先构造一个只含n个顶点的森林，然后依权值从小到大从连通网中选择边加入到森林中，并使森林中不产生回路，直至森林变成一棵树为止。
+- **关键理论**：贪心算法、并查集
 
+![](images/2022-09-08-15-30-47.png)
 ### 6.6.3. 克鲁斯卡尔算法实现
 ```java{.line-numbers}
 public class KruskalCase {
@@ -2103,28 +2451,141 @@ class EData {
     }
 }
 ```
+**完整并查集+Kruskal**
+```java
+public class KruskalTest {
+    //Kruskal相关变量
+    private static int[][] matrix; //邻接矩阵
+    private static final int INF = Integer.MAX_VALUE; //非连通值
+    private static int edgeNum = 7 * 7;  //边数
+    private static char[] vertexes;  //顶点的符号表示
+    private static int shortestPath = 0; //最短路径
+    private static int vertexNum; //顶点的数量
+    //并查集相关变量
+    private static int[] pre;
+    private static int[] rank;
 
+    public static void main(String[] args) {
+        vertexes = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+        vertexNum = vertexes.length;
+        //克鲁斯卡尔算法的邻接矩阵
+        matrix = new int[][]{
+                /*A*//*B*//*C*//*D*//*E*//*F*//*G*/
+                /*A*/ {0, 12, INF, INF, INF, 16, 14},
+                /*B*/ {12, 0, 10, INF, INF, 7, INF},
+                /*C*/ {INF, 10, 0, 3, 5, 6, INF},
+                /*D*/ {INF, INF, 3, 0, 4, INF, INF},
+                /*E*/ {INF, INF, 5, 4, 0, 2, 8},
+                /*F*/ {16, 7, 6, INF, 2, 0, 9},
+                /*G*/ {14, INF, INF, INF, 8, 9, 0}};
+        Edge[] edges = edgeInit();
+        unionFindInit();
+        List<Edge> list = Kruskal(edges);
+        System.out.println(list);
+        System.out.println("shortestPath = " + shortestPath);
+    }
 
-## Dijkstra
-### 最短路径问题
+    //读取边
+    public static Edge[] edgeInit() {
+        //根据边数，初始化边的数组
+        Edge[] edges = new Edge[edgeNum];
+        int index = 0;
+        //封装到类中，只遍历下三角即可
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (matrix[i][j] != INF) edges[index++] = new Edge(i, j, matrix[i][j]);
+            }
+        }
+        //将null值扔掉。如果边数确定，则不会存在null值
+        edges = Arrays.copyOfRange(edges,0,index);
+        //根据权值排序
+        Arrays.sort(edges, Comparator.comparingInt(o -> o.weight));
+        return edges;
+    }
+
+    //初始化并查集
+    public static void unionFindInit() {
+        pre = new int[vertexNum + 1];
+        rank = new int[vertexNum + 1];
+        for (int i = 0; i < vertexNum; i++) pre[i] = i;
+    }
+
+    //查找祖先
+    public static int find(int x) {
+        if (pre[x] == x) return x;
+        return pre[x] = find(pre[x]);
+    }
+
+    //连接
+    public static boolean union(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x==y) return false;
+        if (rank[x]>rank[y]) pre[y] = x;
+        else {
+            if (rank[x]==rank[y]) rank[y]++;
+            pre[x] = y;
+        }
+        return true;
+    }
+
+    //将边结果放入数组，并纪录最小路径
+    public static List<Edge> Kruskal(Edge[] edges) {
+        List<Edge> res = new LinkedList<>();
+        for (Edge edge : edges) {
+            if (union(edge.start,edge.end)){
+                res.add(edge);
+                shortestPath+=edge.weight;
+            }
+            if (res.size()==vertexNum-1) break;
+        }
+        return res;
+    }
+}
+
+//封装类
+class Edge {
+    public int start;
+    public int end;
+    public int weight;
+
+    public Edge(int start, int end, int weight) {
+        this.start = start;
+        this.end = end;
+        this.weight = weight;
+    }
+
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "start=" + start +
+                ", end=" + end +
+                ", weight=" + weight +
+                '}';
+    }
+}
+```
+
+## 6.7. Dijkstra
+### 6.7.1. 最短路径问题
 <center><img src="images/2022-07-31-23-26-11.png"></center>
 
 - 战争时期，胜利乡有7个村庄(A, B, C, D, E, F, G) ，现在有六个邮差，从G点出发，需要分别把邮件分别送到 A, B, C , D, E, F 六个村庄
 - 各个村庄的距离用边线表示(权) ，比如 A – B 距离 5公里
-- 问：如何计算出G村庄到 其它各个村庄的最短距离? 
+- 问：如何计算出G村庄到其它各个村庄的最短距离? 
 - 如果从其它点出发到各个点的最短距离又是多少?
 
-### Dijkstra算法过程
+### 6.7.2. Dijkstra算法过程
 **算法介绍**
-迪杰斯特拉(Dijkstra)算法是典型**最短路径算法**，用于计算一个结点到其他结点的最短路径。它的主要特点是以起始点为中心向外层层扩展(**广度优先搜索思想**)，直到扩展到终点为止。
+迪杰斯特拉(Dijkstra)算法是典型**最短路径算法**，用于计算一个结点到其他结点的最短路径。它的主要特点是以起始点为中心向外层扩展(**广度优先搜索思想**)，直到扩展到终点为止。
 **算法过程**
-设置出发顶点为v，顶点集合`V{v1,v2,vi...}`，v到V中各顶点的距离构成距离集合Dis，`Dis{d1,d2,di...}`，Dis集合记录着v到图中各顶点的距离(到自身可以看作0，v到vi距离对应为di)
-1. 从Dis中选择值最小的di并移出Dis集合，同时移出V集合中对应的顶点vi，此时的v到vi即为最短路径
-2. 更新Dis集合，更新规则为：比较v到V集合中顶点的距离值，与v通过vi到V集合中顶点的距离值，保留值较小的一个(同时也应该更新顶点的前驱节点为vi，表明是通过vi到达的)
+设置出发顶点为$v$，顶点集合$V\{v_1,v_2,v_i...\}$，$v$到$V$中各顶点的距离构成距离集合$Dis$，$Dis\{d_1,d_2,d_i...\}$，$Dis$集合记录着$v$到图中各顶点的距离(到自身可以看作0，$v$到$v_i$距离对应为$d_i$)
+1. 从$Dis$中选择值最小的$di$并移出$Dis$集合，同时移出$V$集合中对应的顶点$v_i$，此时的$v$到$v_i$即为最短路径
+2. 更新$Dis$集合，更新规则为：比较$v$到$V$集合中顶点的距离值，与$v$通过$v_i$到$V$集合中顶点的距离值，保留值较小的一个(同时也应该更新顶点的前驱节点为$v_i$，表明是通过$v_i$到达的)
 3. 重复执行两步骤，直到最短路径顶点为目标顶点即可结束
 
 
-### Dijkstra代码实现
+### 6.7.3. Dijkstra代码实现
 ```java
 public class DijkstraAlgorithm {
     public static void main(String[] args) {
@@ -2318,15 +2779,80 @@ class VisitedVertex {
     }
 }
 ```
+**精简版-少去类的定义**
+```java
+public class DijkstraTest {
+    public static final int BEGIN = 6; //出发点
+    public static int[] pre; //前驱顶点
+    public static int[] dis; //距离数组
+    public static boolean[] isVisited; //结点是否被访问过
+    public static int vertexNum; //顶点数量
+    public static final int N = 65535;//表示不可连接
+    public static int[][] matrix; //邻接矩阵
 
-## 弗洛伊德算法
-### 算法介绍
+    public static void main(String[] args) {
+        char[] vertex = {'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+        matrix = new int[vertex.length][vertex.length];
+        matrix[0] = new int[]{N, 5, 7, N, N, N, 2};
+        matrix[1] = new int[]{5, N, N, 9, N, N, 3};
+        matrix[2] = new int[]{7, N, N, N, 8, N, N};
+        matrix[3] = new int[]{N, 9, N, N, N, 4, N};
+        matrix[4] = new int[]{N, N, 8, N, N, 5, 4};
+        matrix[5] = new int[]{N, N, N, 4, 5, N, 6};
+        matrix[6] = new int[]{2, 3, N, N, 4, 6, N};
+        pre = new int[matrix.length];
+        dis = new int[matrix.length];
+        isVisited = new boolean[matrix.length + 1];
+        vertexNum = vertex.length;
+        dijkstra();
+        int sum = Arrays.stream(dis).sum();
+        System.out.println(sum);
+    }
+
+    public static void dijkstra() {
+        Arrays.fill(dis, N); //初始化填充
+        dis[BEGIN] = 0; //起点到起点为0
+        isVisited[BEGIN] = true; //置起点已访问
+        pre[BEGIN] = -1; //置起点的前驱顶点
+        update(BEGIN); //更新起点到各个顶点距离
+        //for循环将起点连通其他n-1个顶点
+        for (int i = 1; i < vertexNum; i++) {
+            int minLen = N;
+            int index = 0;
+            //每次找最短距离对应的顶点
+            for (int j = 0; j < vertexNum; j++) {
+                if (!isVisited[j] && minLen > dis[j]) {
+                    minLen = dis[j];
+                    index = j;
+                }
+            }
+            isVisited[index] = true;
+            update(index);
+        }
+    }
+
+    //更新出发顶点到各个顶点的距离
+    public static void update(int index) {
+        for (int i = 0; i < vertexNum; i++) {
+            //len=出发顶点到index顶点的距离+从index顶点到i顶点的距离的和
+            int len = dis[index] + matrix[index][i];
+            if (!isVisited[i] && len < dis[i]) {
+                dis[i] = len;
+                pre[i] = index;
+            }
+        }
+    }
+}
+```
+
+## 6.8. 弗洛伊德算法
+### 6.8.1. 算法介绍
 1. 和Dijkstra算法一样，弗洛伊德(Floyd)算法也是一种用于寻找给定的加权图中顶点间最短路径的算法。该算法名称以创始人之一、1978年图灵奖获得者、斯坦福大学计算机科学系教授罗伯特·弗洛伊德命名
 2. 弗洛伊德算法(Floyd)计算图中**各个顶点之间的最短路径**
 3. 迪杰斯特拉算法用于计算图中某一个顶点到其他顶点的最短路径。
 4. **弗洛伊德算法** VS **迪杰斯特拉算法**：迪杰斯特拉算法通过选定的被访问顶点，求出从出发访问顶点到其他顶点的最短路径；弗洛伊德算法中每一个顶点都是出发访问点，所以需要将每一个顶点看做被访问顶点，求出从每一个顶点到其他顶点的最短路径。
 
-### 算法分析与实现
+### 6.8.2. 算法分析与实现
 <center><img src="images/2022-08-01-15-52-22.png"></center>
 
 - 设置顶点$v_i$到顶点$v_k$的最短路径已知为$L_{i,k}$，顶点$v_k$到$v_j$的最短路径已知为$L_{k,j}$，顶点$v_i$到$v_j$的路径为$L_{i,j}$，则$v_i$到$v_j$的最短路径为：$\min((L_{i,k}+L_{k,j}),L_{i,j})$，$v_k$的取值为图中所有顶点，则可获得$v_i$到$v_j$的最短路径
@@ -2418,8 +2944,10 @@ class Graph{
         System.out.println(stringBuilder);
     }
 
+    //找完整路径
     public void traver(HashSet<Integer> set, ArrayList<Integer> path,int left,int right){
         int preVertex = pre[left][right];
+        //找起点->中间结点有没有路过其他顶点
         while (!set.contains(preVertex)){
             set.add(preVertex);
             traver(set,path,left,preVertex);
@@ -2427,6 +2955,7 @@ class Graph{
         if (!path.contains(preVertex)){
             path.add(preVertex);
         }
+        //找中间结点->终点有没有路过其他顶点
         while (!set.contains(preVertex)){
             set.add(preVertex);
             traver(set,path,preVertex,right);
@@ -2466,8 +2995,53 @@ class Graph{
     }
 }
 ```
+简洁版-查找各个顶点之间的最短距离
+```java
+public class FloydTest {
+    public static int[][] matrix; //邻接矩阵
+    public static final int N = Integer.MAX_VALUE/3;//防止加法越界
+    public static int[][] dis; //距离数组
+    public static int[][] pre; //前驱结点
+    public static int vertexNum; //顶点数量
 
-## 马踏棋盘算法
+    public static void main(String[] args) {
+        char[] vertex = {'A','B','C','D','E','F','G'};
+        matrix = new int[vertex.length][vertex.length];
+        matrix[0] = new int[] { 0, 5, 7, N, N, N, 2 };
+        matrix[1] = new int[] { 5, 0, N, 9, N, N, 3 };
+        matrix[2] = new int[] { 7, N, 0, N, 8, N, N };
+        matrix[3] = new int[] { N, 9, N, 0, N, 4, N };
+        matrix[4] = new int[] { N, N, 8, N, 0, 5, 4 };
+        matrix[5] = new int[] { N, N, N, 4, 5, 0, 6 };
+        matrix[6] = new int[] { 2, 3, N, N, 4, 6, 0 };
+        vertexNum = vertex.length;
+        dis = matrix;
+        pre = new int[vertexNum][vertexNum];
+        for (int i = 0; i < vertex.length; i++) {
+            Arrays.fill(pre[i],i);
+        }
+        floyd();
+        System.out.println(Arrays.deepToString(dis));
+    }
+    public static void floyd(){
+        int len = 0; //保存距离
+        //k-中间顶点下标;i-出发点;j-终点
+        for (int k = 0; k < vertexNum; k++) {
+            for (int i = 0; i < vertexNum; i++) {
+                for (int j = 0; j < vertexNum; j++) {
+                    len = dis[i][k] + dis[k][j];
+                    if (len<dis[i][j]){
+                        dis[i][j] = len;
+                        pre[i][j] = k; //更新中间节点
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## 6.9. 马踏棋盘算法
 **介绍**
 <center><img src="images/2022-08-01-22-27-15.png"></center>
 
@@ -2588,15 +3162,528 @@ public class HorseChessboard {
 }
 ```
 
+## 6.10. 回溯算法
+```java
+void backtracking(参数) {
+    if (终止条件) {
+        存放结果;
+        return;
+    }
+
+    for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        backtracking(路径，选择列表); // 递归
+        回溯，撤销处理结果
+    }
+}
+```
+![](images/2022-08-27-22-40-33.png)
+
+### 6.10.1. 组合问题
+**组合定义：取过的数不能重复取。**
+**回溯通用设置：for循环从startIndex开始**
+1. **集合元素在每个组合中只能使用一次，集合没有重复值**
+   **题目**：给定两个整数n和k，返回 1 ... n 中所有可能的 k 个数的组合。
+   **基本思路**：套用模板，for循环从startIndex开始。
+   **剪枝优化**：for循环里设置，当剩余元素不足以构成k个数时，就不用继续了。
+   ![](images/2022-08-30-12-38-04.png)
+    ```java
+    class Solution {
+        List<List<Integer>> result = new ArrayList<>();
+        LinkedList<Integer> path = new LinkedList<>();
+        public List<List<Integer>> combine(int n, int k) {
+            combineHelper(n, k, 1);
+            return result;
+        }
+
+        private void combineHelper(int n, int k, int startIndex){
+            //终止条件
+            if (path.size() == k){
+                result.add(new ArrayList<>(path));
+                return;
+            }
+            for (int i = startIndex; i <= n - (k - path.size()) + 1; i++){
+                path.add(i);
+                combineHelper(n, k, i + 1);
+                path.removeLast();
+            }
+        }
+    }
+    ```
+2. **集合元素在每个组合中可以使用无数次，集合没有重复值**
+   **问题**：给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的数字可以无限制重复被选取。
+   **基本思路**：选取集合元素时子集和满足一定条件的问题，能排序的先排序。首先根据题目设定编写终止条件。递归参数加上子集元素当前的求和结果，方便判断和剪枝。
+   **剪枝优化**：因为排过序，当`sum + candidates[i] > target`之后，就不用遍历了。
+   ![](images/2022-08-30-12-40-40.png)
+   ```Java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public List<Integer> path = new ArrayList<>();
+
+        public List<List<Integer>> combinationSum(int[] candidates, int target) {
+            Arrays.sort(candidates);
+            backtracking(candidates, target, 0, 0);
+            return res;
+        }
+
+        public void backtracking(int[] candidates, int target, int startIndex, int sum) {
+            if (sum == target) {
+                res.add(new ArrayList<>(path));
+                return;
+            }
+            for (int i = startIndex; i < candidates.length && sum + candidates[i] <= target; i++) {
+                path.add(candidates[i]);
+                sum += candidates[i];
+                backtracking(candidates, target, i, sum);
+                path.remove(path.size() - 1);
+                sum -= candidates[i];
+            }
+        }
+    }
+   ```
+3. **集合元素在每个组合中只能使用一次，集合有重复值，且解集不能包含重复的组合**
+    **问题**：给定一个数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的每个数字在每个组合中只能使用一次。所有数字（包括目标数）都是正整数。 解集不能包含重复的组合。
+   **基本思路**：首先能排序就先排序，关键在怎么去重。因为排过序，可以判断，如果当前值等于前一个值，且i不是开始结点，则可以跳过。
+   **剪枝优化**：当`sum + candidates[i] > target`之后，就不用遍历了。
+   ![](images/2022-08-30-13-41-49.png)
+   ```Java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public LinkedList<Integer> path = new LinkedList<>();
+
+        public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+            Arrays.sort(candidates);
+            backtrack(candidates,target,0,0);
+            return res;
+        }
+
+        public void backtrack(int[] candidates, int target, int startIndex, int sum) {
+            if (sum == target) {
+                res.add(new ArrayList<>(path));
+            }
+            for (int i = startIndex; i < candidates.length && sum + candidates[i] <= target; i++) {
+                if (i>startIndex&&candidates[i]==candidates[i-1]) continue;
+                sum += candidates[i];
+                path.add(candidates[i]);
+                backtrack(candidates, target, i + 1, sum);
+                sum -= candidates[i];
+                path.removeLast();
+            }
+        }
+    }
+   ```
+
+4. **不同集合之间的组合数**
+    **问题**：给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+    **基本思路**：因为是不同集合之间的，所以要想遍历所有的情况，每个集合都要从0开始。因此，递归参数不需要startIndex。只需要一个标识符，用来标识当前到了哪个集合（即下面的`num`），每次递归num值加1。当遍历完了所有集合，则递归终止。
+    **剪枝优化**：因为是不同集合之间的所有组合数，因此没有剪枝。
+    ![](images/2022-08-30-13-39-44.png)
+    ```java
+    class Solution {
+        public List<String> res = new ArrayList<>();
+        public HashMap<Character, String> digitToLetter = new HashMap<>() {
+            {
+                put('2', "abc");put('3', "def");put('4', "ghi");
+                put('5', "jkl");put('6', "mno");
+                put('7', "pqrs");put('8', "tuv");put('9', "wxyz");
+            }
+        };
+        public StringBuilder stringBuilder = new StringBuilder();
+
+        public List<String> letterCombinations(String digits) {
+            if (digits.length() == 0) return res;
+            backtracking(digits.toCharArray(), 0);
+            return res;
+        }
+
+        public void backtracking(char[] digits, int num) {
+            if (stringBuilder.length() == digits.length) {
+                res.add(stringBuilder.toString());
+                return;
+            }
+            String str = digitToLetter.get(digits[num]);
+            for (int i = 0; i < str.length(); i++) {
+                stringBuilder.append(str.charAt(i));
+                backtracking(digits, num + 1);
+                stringBuilder.deleteCharAt(stringBuilder.length()-1);
+            }
+        }
+    }
+    ```
+    
+### 6.10.2. 排列问题
+1. **集合元素不重复，求所有可能的全排列**
+    **问题**：给定一个 没有重复 数字的序列，返回其所有可能的全排列。`-10 <= nums[i] <= 10`
+    **基本思路**：
+    1. 要求全排列，所以`{1,2}`和`{2,1}`视为两种情况。所以不需要有`startIndex`，全部从`0`开始，到`nums.length`。
+    2. 树枝去重：同一颗树枝下已经用过的元素不能再用。可以定义一个记忆数组，每次递归将记忆数组当做参数传递到下一层。可以通过记忆数组（效率较高）或中间结果数组判断是否有当前值，有则跳过。
+    
+    **剪枝优化**：无
+    ![](images/2022-08-30-15-39-06.png)
+    ```java
+    class Solution {
+        //最终结果
+        public List<List<Integer>> res = new ArrayList<>();/
+        //中间结果
+        public LinkedList<Integer> path = new LinkedList<>();
+        public List<List<Integer>> permute(int[] nums) {
+            //记忆数组去重
+            backtrack(nums, new boolean[nums.length]);
+            //中间结果去重
+            // backtrack(nums);
+            return res;
+        }
+
+        public void backtrack(int[] nums, boolean[] used) {
+            if (path.size() == nums.length) {
+                res.add(new ArrayList<>(path));
+                return;
+            }
+            for (int i = 0; i < nums.length; i++) {
+                if (used[i]) continue;
+                path.add(nums[i]);
+                used[i] = true;
+                backtrack(nums,used);
+                used[i] = false;
+                path.removeLast();
+            }
+        }
+        
+        public void backtrack(int[] nums) {
+            if (path.size() == nums.length) {
+                res.add(new ArrayList<>(path));
+                return;
+            }
+            for (int num : nums) {
+                if (path.contains(num)) continue;
+                path.add(num);
+                backtrack(nums);
+                path.removeLast();
+            }
+        }
+    }
+    ```
+
+2. **集合元素有重复，求所有可能的不重复的全排列**
+    **问题**：给定一个可包含重复数字的序列 `nums` ，按任意顺序 返回所有不重复的全排列。
+    **基本思路**：
+    1. 包含重复数字，所以要先排序。
+    2. 去重方式有两种，可以树枝去重也可以树层去重。不过树层去重效率高。
+    3. 如果当前值不是起点，并且当前值等于前一个值，且前一个结点已经在树层中用过，则`continue`。
+    4. 因为`for`从0开始，自然地，需要纪录树枝是否被用过，所有要将`used[]`作为递归参数传递。
+    
+    **剪枝优化**：无
+    **树层去重(used[i-1]==false)**
+    ![](images/2022-08-30-15-58-19.png)
+    **树枝去重(used[i-1]==true)**
+    ![](images/2022-08-30-15-58-44.png)
+
+    ```Java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public LinkedList<Integer> path = new LinkedList<>();
+
+        public List<List<Integer>> permuteUnique(int[] nums) {
+            Arrays.sort(nums);
+            backtrack(nums,new boolean[nums.length]);
+            return res;
+        }
+
+        public void backtrack(int[] nums, boolean[] used){
+            if (path.size()==nums.length){
+                res.add(new ArrayList<>(path));
+                return;
+            }
+            for (int i = 0; i < nums.length; i++) {
+                //树层去重
+                if (i>0&&nums[i]==nums[i-1]&&!used[i-1]) continue;
+                //如果当前树枝没有被用到才执行下面
+                if (!used[i]){
+                    used[i] = true; //树枝被用过
+                    path.add(nums[i]);
+                    backtrack(nums,used);
+                    path.removeLast();
+                    used[i] = false; //树层被用过
+                }
+            }
+        }
+    }
+    ```
 
 
+### 6.10.3. 子集问题
+1. **集合元素不重复，求不重复的所有子集。**
+    **问题**：给定一组不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。说明：解集不能包含重复的子集。
+    **基本思路**：
+    1. 要求的子集不能重复，即`{1,2}`和`{2,1}`看做同一种情况。这其实就相当于选择过的元素不能再选，所以递归参数要包含`startIndex`。
+    2. 因为要求所有子集，即中间结果的长度可以是`0,1,2,......,nums.length`。所以没有递归结束条件，等for循环执行完自然就结束了。每次递归都需要将当前中间结果加入到最终结果中。
+    
+    **剪枝优化**：因为是求所有子集，没有条件限制，所以没有剪枝。
+    ![](images/2022-08-30-15-00-26.png)
+    ```java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public LinkedList<Integer> path = new LinkedList<>();
 
+        public List<List<Integer>> subsets(int[] nums) {
+            backtrack(nums, 0);
+            return res;
+        }
 
+        public void backtrack(int[] nums, int startIndex) {
+            res.add(new ArrayList<>(path));
+            for (int i = startIndex; i < nums.length; i++) {
+                path.addLast(nums[i]);
+                backtrack(nums,i+1);
+                path.removeLast();
+            }
+        }
+    }
+    ```
+    
+2. **集合元素重复，求不重复的所有子集**
+    **问题**：给定一组可能包含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。说明：解集不能包含重复的子集。
+    **基本思路**：
+    1. 因为集合元素有重复值，所以考虑先排序，然后树层去重使结果没有重复。
+    2. 要求的子集不能重复，即`{1,2}`和`{2,1}`看做同一种情况。这其实就相当于选择过的元素不能再选，所以递归参数要包含`startIndex`。
+    3. 因为要求所有子集，即中间结果的长度可以是`0,1,2,......,nums.length`。所以没有递归结束条件，等for循环执行完自然就结束了。每次递归都需要将当前中间结果加入到最终结果中。
+    4. 树层去重：如果当前索引不是`startIndex`，并且当前值与前一个值相同，那就跳到集合中的下一个元素。
+   
+    **剪枝优化**：因为是求所有子集，没有条件限制，所以没有剪枝。
+    ![](images/2022-08-30-15-01-16.png)
+    ```java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public LinkedList<Integer> path = new LinkedList<>();
 
+        public List<List<Integer>> subsetsWithDup(int[] nums) {
+            Arrays.sort(nums);
+            backtrack(nums,0);
+            return res;
+        }
 
+        public void backtrack(int[] nums, int startIndex){
+            res.add(new ArrayList<>(path));
+            for (int i = startIndex; i < nums.length; i++) {
+                if (i>startIndex&&nums[i]==nums[i-1]) continue;
+                path.add(nums[i]);
+                backtrack(nums,i+1);
+                path.removeLast();
+            }
+        }
+    }
+    ```
 
+3. **集合元素重复，求不重复的所有子集**
+    **问题**：给定一个整型数组, 你的任务是找到所有该数组的递增子序列，递增子序列的长度至少是2。示例:输入: `[4, 6, 7, 7]`。输出: `[[4, 6], [4, 7], [4, 6, 7], [4, 6, 7, 7], [6, 7], [6, 7, 7], [7,7], [4,7,7]]`。说明:(1). 给定数组的长度不会超过15。(2). 数组中的整数范围是 [-100,100]。(3). 给定数组中可能包含重复数字，相等的数字应该被视为递增的一种情况。
 
+    **基本思路**：
+   1. 集合中选过的元素不能再选，所以`for`循环要从`startIndex`开始。
+   2. **子集不能重复，且集合元素不能改变位置。因此不能排序然后树层去重。**
+   3. 为了实现同一个父结点下的树层去重，考虑定义一个记忆数组，纪录已经被遍历过的**值**（不是下标）。每一个父结点下面都有一个记忆数组，因此要将记忆数组定义在for循环上边。
+   4. 因为要遍历所有子集，所以递归结束条件不设置，随着for循环的结束而结束。要求递增子序列的长度至少是2，因此要将长度作为将中间结果添加到最终结果的限制。
+   5. 要求子集是递增的，所以如果当前值小于中间结果的最后一个值或者当前树层元素已经用过，则`continue`。
 
+    **剪枝优化**：题目本质还是遍历所有子集，因此没有剪枝优化。
+    ![](images/2022-08-30-15-03-13.png)
+    ```Java
+    class Solution {
+        public List<List<Integer>> res = new ArrayList<>();
+        public LinkedList<Integer> path = new LinkedList<>();
 
+        public List<List<Integer>> findSubsequences(int[] nums) {
+            backtrack(nums,0);
+            return res;
+        }
 
+        public void backtrack(int[] nums, int startIndex){
+            if (path.size()>=2){
+                res.add(new ArrayList<>(path));
+            }
+            int[] used = new int[201];
+            for (int i = startIndex; i < nums.length; i++) {
+                //同一父节点下的同层上使用过的元素就不能在使用了
+                if (!path.isEmpty()&&nums[i]<path.getLast()||(used[nums[i]+100]==1)) continue;
+                used[nums[i]+100] = 1;
+                path.addLast(nums[i]);
+                backtrack(nums,i+1);
+                path.removeLast();
+            }
+        }
+    }
+    ```
 
+### 6.10.4. 切割问题
+**问题**：给定一个字符串 s，将 s 分割成一些子串，使每个子串都是回文串。返回 s 所有可能的分割方案。示例: 输入: `"aab"` 输出: `[ ["aa","b"],["a","a","b"] ]`。
+**基本思路**：
+ 1. 将字符串s看做一个集合，因为选过的元素不能再选，所以递归参数需要传`startIndex`。
+ 2. 从`startIndex`开始分割，有`str.length()-startIndex`种分割情况（先不考虑回文串）。所以可以设置一个`for`循环。起点为`startIndex`，终点为`str.length()`。
+ 3. 对于每一种分割情况`startIndex -> startIndex + i`，需要考虑当前分割是否构成回文串。如果可以，则将分割结果加进中间结果列表中，并向下递归。其中下次递归的起始点为，当前分割的结尾，即`i+1`。否则跳到下一种分割情况，即`continue`，使得`i++`。
+ 4. 当起始点到达字符串的长度时，说明找到了一组分割方案，则将中间结果加入最终结果中。
+   
+**剪枝优化**：无。
+![](images/2022-08-30-15-07-27.png)
+```java
+class Solution {
+    List<List<String>> lists = new ArrayList<>();
+    Deque<String> deque = new LinkedList<>();
+
+    public List<List<String>> partition(String s) {
+        backTracking(s, 0);
+        return lists;
+    }
+
+    private void backTracking(String s, int startIndex) {
+        //如果起始位置大于s的大小，说明找到了一组分割方案
+        if (startIndex >= s.length()) {
+            lists.add(new ArrayList(deque));
+            return;
+        }
+        for (int i = startIndex; i < s.length(); i++) {
+            //如果是回文子串，则记录
+            if (isPalindrome(s, startIndex, i)) {
+                String str = s.substring(startIndex, i + 1);
+                deque.addLast(str);
+            } else {
+                continue;
+            }
+            //起始位置后移，保证不重复
+            backTracking(s, i + 1);
+            deque.removeLast();
+        }
+    }
+    //判断是否是回文串
+    private boolean isPalindrome(String s, int startIndex, int end) {
+        for (int i = startIndex, j = end; i < j; i++, j--) {
+            if (s.charAt(i) != s.charAt(j)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### 6.10.5. 总结
+1. `for`循环中的`continue`与`break`
+    - 一般情况下都默认使用`continue`。除非确定集合后面的元素都不会满足条件时（即**剪枝**），才使用`break`。不过一般会将`break`放在`for`循环的条件里边。比如[组合问题中的第二类](#6101-组合问题)。
+
+2. 去重记录数组`used[i]`(里面装下标)，与`used[nums[i]]`(里面装值)的使用场景。
+    - 当集合可以排序的时候，可以用`i>startIndex&&nums[i]==nums[i-1]&&used[i-1]`，也可以用`used[nums[i]]`来树层去重。
+    - 当集合不能排序的时候，只能用`used[nums[i]]`来树层去重。
+    - `used[i]`通常比`used[nums[i]]`数组小，因此优先使用前者。
+
+3. 树层去重与树枝去重使用场景
+   - 树枝去重：排列问题。
+   - 树层去重：集合元素重复问题。
+
+4. 记忆数组的位置：全局/递归参数/局部变量
+   - 全局：控制整颗树，包括树枝。一般放最终结果和中间结果。
+   - 递归参数：面向排列问题，因`for`从0开始的情况，为了纪录树枝被用过，要将记忆数组作为递归参数传递。
+   - 局部变量：一般在`for`循环的上边定义。作用域为同一节点下的本层。
+
+5. `for`循环中`i = startIndex`与`i = 0`起点设置
+    - `i=startIndex`一般用来求组合问题
+    - `i=0`一般用来求排列问题
+6. 递归函数返回值的确定
+    - 如果需要**搜索全局且不用处理递归返回值，递归函数就不要返回值**。（这种情况就是113.路径总和ii）
+    - 如果需要**搜索全局且需要处理递归返回值，递归函数就需要返回值**。 （这种情况我们在236. 二叉树的最近公共祖先 (opens new window)中介绍）
+    - 如果要**搜索其中一条符合条件的情况**，那么**递归一定需要返回值**，因为遇到符合条件的路径了就要及时返回。（本题的情况）
+
+## 6.11. 并查集
+### 6.11.1. 概述
+**定义：**
+并查集是一种树型的数据结构，用于处理一些不相交集合的合并及查询问题（即所谓的并、查）。比如说，我们可以用并查集来判断一个森林中有几棵树、某个节点是否属于某棵树等。
+
+**主要构成：**
+并查集主要由一个整型数组pre[ ]和两个函数find( )、join( )构成。
+数组 pre[ ] 记录了每个点的前驱节点是谁，函数 find(x) 用于查找指定节点 x 属于哪个集合，函数 join(x,y) 用于合并两个节点 x 和 y 。
+
+**作用：**
+并查集的主要作用是求连通分支数（如果一个图中所有点都存在可达关系（直接或间接相连），则此图的连通分支数为1；如果此图有两大子图各自全部可达，则此图的连通分支数为2……）
+
+### 6.11.2. 通用代码
+```java
+public class UnionFind {
+    public int[] pre; //存放父亲结点
+    public int[] rank; //层数
+
+    public static void main(String[] args) {
+        
+    }
+
+    /**
+     * 并查集初始化
+     * 将所有结点的上级指向自己
+     * @param n-总结点个数
+     * @author zhaolifeng
+     * @date 2022/9/4 13:59
+     */
+    public void init(int n) {
+        pre = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) pre[i] = i;
+    }
+
+    /**
+     * 查找结点x的根结点
+     * @param x-传入结点
+     * @return 结点x的根结点
+     * @author zhaolifeng
+     * @date 2022/9/4 21:32
+     */
+    public int find(int x) {
+        if (pre[x] == x) return x;
+        return pre[x] = find(pre[x]);
+    }
+
+    /**
+     * 将两个结点的根结点连接
+     * @param x-结点x
+     * @param y-结点y
+     * @return 是否连接成功
+     * @author zhaolifeng
+     * @date 2022/9/4 21:33
+     */
+    public boolean union(int x, int y) {
+        x = find(x);  //寻找x的代表元
+        y = find(y);  //寻找y的代表元
+        if (x==y) return false; //如果x,y代表元一致，说明他们属于同一集合，无需合并。
+        if (rank[x] > rank[y]) pre[y] = x; //如果x的高度大于y，则令y的上级为x
+        else {
+            //如果x的高度小于等于y，则将x合并至y
+            if (rank[x] == rank[y]) rank[y]++;
+            pre[x] = y;
+        }
+        return true;
+    }
+
+    /**
+     * 判断两个结点是否连通
+     * @param x-结点x
+     * @param y-结点y
+     * @return 两个结点是否连通
+     * @author zhaolifeng
+     * @date 2022/9/4 21:44
+     */
+    public boolean isSame(int x,int y){
+        return find(x)==find(y);
+    }
+
+}
+```
+
+### 6.11.3. 总结
+1. 用集合中的某个元素来代表这个集合，则该元素称为此集合的**代表元**；
+2. 一个集合内的所有元素组织成以代表元为根的**树形结构**；
+3. 对于每一个元素 x，pre[x] 存放 x 在树形结构中的**父亲节点**（如果 x 是根节点，则令pre[x] = x）；
+4. 对于查找操作，假设需要确定 x 所在的的集合，也就是确定集合的代表元。可以沿着pre[x]不断在树形结构中向上移动，直到到达根节点。
+
+因此，基于这样的特性，并查集的**主要用途**有以下两点：
+1. 维护无向图的**连通性**（判断两个点是否在同一连通块内，或增加一条边后是否会产生环）；
+2. 用在求解**最小生成树**的Kruskal算法里。
+
+一般来说，一个并查集对应三个操作：
+1. 初始化（ Init()函数 ）
+2. 查找函数（ Find()函数 ）
+3. 合并集合函数（ Union()函数 ）

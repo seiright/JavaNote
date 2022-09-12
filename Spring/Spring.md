@@ -650,7 +650,7 @@ AOP（Aspect Oriented Programming）意为：**面向切面编程**，通过预�
     <aop:config>
         <!--   切入点    -->
         <aop:pointcut id="pointcut" expression="execution(* com.service.UserServiceImpl.*(..))"/>
-        <!--   执行环绕增加    -->
+        <!--   执行环绕增强    -->
         <aop:advisor advice-ref="log" pointcut-ref="pointcut"/>
         <aop:advisor advice-ref="afterLog" pointcut-ref="pointcut"/>
     </aop:config>

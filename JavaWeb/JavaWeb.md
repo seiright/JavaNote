@@ -101,7 +101,7 @@
    4. Servlet的初始化时机：通过`<load-on-startup>`设置启动时机，数字越小启动优先级越高。
    5. Servlet在容器中时：单例的、线程不安全的
       - 单例：所有的请求都是同一个实例响应
-      - 线程不安全：一个线程需要根据这个实例中的某个成员变量值去做逻辑判断。但是在中间某个时机，另一个县城改变了这个成员变量的值，从而导致第一个线程的执行路径发生了变化
+      - 线程不安全：一个线程需要根据这个实例中的某个成员变量值去做逻辑判断。但是在中间某个时机，另一个线程改变了这个成员变量的值，从而导致第一个线程的执行路径发生了变化
       - 尽量不要在Servlet中定义成员变量。如果不得不定义成员变量。那需遵守：(1)**不要去修改成员变量的值**。(2)**根据成员变量值做逻辑判断**
 
 ## 2.5. Servlet初始化
@@ -463,23 +463,23 @@ Axios执行Ajax操作的步骤：
          </student>
       </students>
       ```
-   JSON格式表示两个学员信息的代码如下：
-   `[{sid:"s001",age:18},{sid:"s002",age:19}]`
-   - JSON表达数据更简洁，更能够节约网络带宽
-   - 客户端发送JSON格式的数据给服务器端
-     1. 客户端中params需要修改成：data:
-     2. 服务器获取参数值不再是 `request.getParameter()`...而是：
-         ```java
-         StringBuffer stringBuffer = new StringBuffer("");
-         BufferedReader bufferedReader = request.getReader();
-         String str = null ;
-         while((str=bufferedReader.readLine())!=null){
-            stringBuffer.append(str);
-         }
-         str = stringBuffer.toString() ;
-         ```
-     3. 我们会发现 str的内容如下：
-      `{"uname":"lina","pwd":"ok"}`
+      JSON格式表示两个学员信息的代码如下：
+      `[{sid:"s001",age:18},{sid:"s002",age:19}]`
+      - JSON表达数据更简洁，更能够节约网络带宽
+      - 客户端发送JSON格式的数据给服务器端
+      1. 客户端中params需要修改成：data:
+      2. 服务器获取参数值不再是 `request.getParameter()`...而是：
+            ```java
+            StringBuffer stringBuffer = new StringBuffer("");
+            BufferedReader bufferedReader = request.getReader();
+            String str = null ;
+            while((str=bufferedReader.readLine())!=null){
+               stringBuffer.append(str);
+            }
+            str = stringBuffer.toString() ;
+            ```
+      3. 我们会发现 str的内容如下：
+         `{"uname":"lina","pwd":"ok"}`
 
    -  服务器端给客户端响应JSON格式的字符串，然后客户端需要将字符串转化成js Object
 
